@@ -1,5 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Alert} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from 'react-native';
 
 const GamePlay: React.FC = () => {
   const [ballPosition, setBallPosition] = useState<number>(
@@ -7,6 +13,7 @@ const GamePlay: React.FC = () => {
   );
   const [selectedCup, setSelectedCup] = useState<number | null>(null);
   const [gameResult, setGameResult] = useState<string | null>(null);
+  const [animation] = useState(new Animated.Value(0));
 
   const handleCupSelect = (cupIndex: number) => {
     setSelectedCup(cupIndex);
@@ -16,22 +23,64 @@ const GamePlay: React.FC = () => {
     } else {
       setGameResult('lose');
     }
-    console.log('Cup Selected:', cupIndex);
-    console.log('Ball Position:', ballPosition);
-    console.log('Game Result:', gameResult);
   };
 
   const restartGame = () => {
     setBallPosition(Math.floor(Math.random() * 3) + 1);
     setSelectedCup(null);
     setGameResult(null);
+    startAnimation();
+  };
+
+  const startAnimation = () => {
+    const cups = [0, 1, 2];
+    const animationSequence = cups.map((_, index) => {
+      return Animated.timing(animation, {
+        toValue: index + 1,
+        duration: 500,
+        useNativeDriver: false,
+      });
+    });
+    Animated.sequence(animationSequence).start();
   };
 
   useEffect(() => {
     restartGame();
-    console.log();
+    startAnimation();
   }, []);
 
+  const cupStyle = (index: number) => {
+    let outputRangeY;
+    let outputRangeX;
+
+    if (index === 1) {
+      outputRangeY = [0, 0, 0, 0];
+      outputRangeX = [0, 150, 250, 0];
+    } else if (index === 2) {
+      outputRangeY = [0, 0, 0, 0];
+      outputRangeX = [0, -125, 125, 0];
+    } else if (index === 3) {
+      outputRangeY = [0, 0, 0, 0];
+      outputRangeX = [0, -250, -150, 0];
+    }
+
+    return {
+      transform: [
+        {
+          translateY: animation.interpolate({
+            inputRange: [0, 1, 2, 3],
+            outputRange: outputRangeY as any,
+          }),
+        },
+        {
+          translateX: animation.interpolate({
+            inputRange: [0, 1, 2, 3],
+            outputRange: outputRangeX as any,
+          }),
+        },
+      ],
+    };
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -44,11 +93,15 @@ const GamePlay: React.FC = () => {
             key={cupIndex}
             style={styles.cup}
             onPress={() => handleCupSelect(cupIndex)}>
-            <Image
+            <Animated.Image
               source={require('../assets/plastic-cup.png')}
-              style={[styles.cupImage, {marginBottom: gameResult ? 50 : 0}]}
+              style={[
+                styles.cupImage,
+                cupStyle(cupIndex),
+                {marginBottom: gameResult ? 50 : 0},
+              ]}
             />
-            {ballPosition == cupIndex && gameResult && (
+            {ballPosition === cupIndex && gameResult && (
               <Image
                 source={require('../assets/ball.png')}
                 style={styles.ball}
@@ -57,7 +110,7 @@ const GamePlay: React.FC = () => {
           </TouchableOpacity>
         ))}
       </View>
-      {gameResult == 'win' && (
+      {gameResult === 'win' && (
         <View style={styles.restart}>
           <Image
             source={require('../assets/you-win.png')}
@@ -71,7 +124,7 @@ const GamePlay: React.FC = () => {
           </TouchableOpacity>
         </View>
       )}
-      {gameResult == 'lose' && (
+      {gameResult === 'lose' && (
         <View style={styles.restart}>
           <Image
             source={require('../assets/you-lose.png')}
