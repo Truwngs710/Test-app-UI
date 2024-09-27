@@ -6,20 +6,22 @@ const GamePlay: React.FC = () => {
     Math.floor(Math.random() * 3),
   );
   const [selectedCup, setSelectedCup] = useState<number | null>(null);
+  const [gameResult, setGameResult] = useState<string | null>(null);
 
   const handleCupSelect = (cupIndex: number) => {
     setSelectedCup(cupIndex);
 
     if (cupIndex === ballPosition) {
-      Alert.alert('Congratulations!', 'You found the ball!');
+      setGameResult('win');
     } else {
-      Alert.alert('Try Again!', 'The ball is under cup ' + ballPosition);
+      setGameResult('lose');
     }
   };
 
   const restartGame = () => {
     setBallPosition(Math.floor(Math.random() * 3));
     setSelectedCup(null);
+    setGameResult(null);
   };
 
   useEffect(() => {
@@ -51,6 +53,34 @@ const GamePlay: React.FC = () => {
           </TouchableOpacity>
         ))}
       </View>
+      {gameResult == 'win' && (
+        <View style={styles.restart}>
+          <Image
+            source={require('../assets/you-win.png')}
+            style={styles.resultImage}
+          />
+          <TouchableOpacity onPress={restartGame}>
+            <Image
+              source={require('../assets/tap-to-restart.png')}
+              style={styles.restartImage}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+      {gameResult == 'lose' && (
+        <View style={styles.restart}>
+          <Image
+            source={require('../assets/you-lose.png')}
+            style={styles.resultImage}
+          />
+          <TouchableOpacity onPress={restartGame}>
+            <Image
+              source={require('../assets/tap-to-restart.png')}
+              style={styles.restartImage}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -86,12 +116,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 35,
   },
-  restartButton: {
-    marginTop: 20,
+  restart: {
+    position: 'absolute',
   },
+  resultImage: {resizeMode: 'contain', marginBottom: 200},
   restartImage: {
-    width: 150,
-    height: 50,
+    resizeMode: 'contain',
   },
 });
 
