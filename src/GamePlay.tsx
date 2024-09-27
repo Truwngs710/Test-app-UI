@@ -3,7 +3,7 @@ import {View, Image, StyleSheet, TouchableOpacity, Alert} from 'react-native';
 
 const GamePlay: React.FC = () => {
   const [ballPosition, setBallPosition] = useState<number>(
-    Math.floor(Math.random() * 3),
+    Math.floor(Math.random() * 3) + 1,
   );
   const [selectedCup, setSelectedCup] = useState<number | null>(null);
   const [gameResult, setGameResult] = useState<string | null>(null);
@@ -16,16 +16,20 @@ const GamePlay: React.FC = () => {
     } else {
       setGameResult('lose');
     }
+    console.log('Cup Selected:', cupIndex);
+    console.log('Ball Position:', ballPosition);
+    console.log('Game Result:', gameResult);
   };
 
   const restartGame = () => {
-    setBallPosition(Math.floor(Math.random() * 3));
+    setBallPosition(Math.floor(Math.random() * 3) + 1);
     setSelectedCup(null);
     setGameResult(null);
   };
 
   useEffect(() => {
     restartGame();
+    console.log();
   }, []);
 
   return (
@@ -42,9 +46,9 @@ const GamePlay: React.FC = () => {
             onPress={() => handleCupSelect(cupIndex)}>
             <Image
               source={require('../assets/plastic-cup.png')}
-              style={styles.cupImage}
+              style={[styles.cupImage, {marginBottom: gameResult ? 50 : 0}]}
             />
-            {selectedCup === cupIndex && (
+            {ballPosition == cupIndex && gameResult && (
               <Image
                 source={require('../assets/ball.png')}
                 style={styles.ball}
