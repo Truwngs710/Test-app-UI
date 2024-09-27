@@ -1,8 +1,16 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {View, StyleSheet, Alert, Image, TouchableOpacity} from 'react-native';
+import {NativeStackNavigationProp} from 'react-native-screens/lib/typescript/native-stack/types';
+import {RootStackParamList} from './constant';
 
 const Home: React.FC = () => {
-  const handlePress = () => {};
+  type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
+  const handlePress = () => {
+    navigation.navigate('GamePlay');
+  };
 
   return (
     <View style={styles.container}>
